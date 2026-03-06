@@ -8,6 +8,10 @@ const fs = require("fs");
 // ============================================================
 function getShiftDuration(startTime, endTime) {
     // TODO: Implement this function
+      let startMins = parseTimeToMinutes(startTime);
+  let endMins = parseTimeToMinutes(endTime);
+  if (endMins < startMins) endMins += 24 * 60; // Overnight shift
+  return formatMinutes((endMins - startMins) / 60);
 }
 
 // ============================================================
