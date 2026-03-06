@@ -1,5 +1,27 @@
 const fs = require("fs");
+//parser functions
+function parseTimeToSeconds(timeStr) {
+    timeStr = timeStr.trim().toLowerCase();
+    const isPM = timeStr.endsWith("pm");
+    const isAM = timeStr.endsWith("am");
+    const [h, m, s] = timeStr.replace("am","").replace("pm","").trim().split(":").map(Number);
+    let hours = h;
+    if (isPM && hours !== 12) hours += 12;
+    if (isAM && hours === 12) hours = 0;
+    return hours * 3600 + m * 60 + s;
+}
 
+function parseDurationToSeconds(durStr) {
+    const [h, m, s] = durStr.trim().split(":").map(Number);
+    return h * 3600 + m * 60 + s;
+}
+
+function formatSeconds(totalSecs) {
+    const h = Math.floor(totalSecs / 3600);
+    const m = Math.floor((totalSecs % 3600) / 60);
+    const s = totalSecs % 60;
+    return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
 // ============================================================
 // Function 1: getShiftDuration(startTime, endTime)
 // startTime: (typeof string) formatted as hh:mm:ss am or hh:mm:ss pm
@@ -8,10 +30,10 @@ const fs = require("fs");
 // ============================================================
 function getShiftDuration(startTime, endTime) {
     // TODO: Implement this function
-      let startMins = parseTimeToMinutes(startTime);
-  let endMins = parseTimeToMinutes(endTime);
-  if (endMins < startMins) endMins += 24 * 60; // Overnight shift
-  return formatMinutes((endMins - startMins) / 60);
+    let start = parseTimeToSeconds(startTime);
+    let end   = parseTimeToSeconds(endTime);
+    if (end < start) end += 24 * 3600;
+    return formatSeconds(end - start);
 }
 
 // ============================================================
@@ -22,6 +44,11 @@ function getShiftDuration(startTime, endTime) {
 // ============================================================
 function getIdleTime(startTime, endTime) {
     // TODO: Implement this function
+        let start = parseTimeToSeconds(startTime);
+    let end   = parseTimeToSeconds(endTime);
+    if (end < start) end += 24 * 3600;
+    const shiftSecs = end - start;
+    return formatSeconds(shiftSecs % (7 * 3600));
 }
 
 // ============================================================
